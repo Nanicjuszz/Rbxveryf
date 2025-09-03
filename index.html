@@ -100,10 +100,10 @@
       const code = document.getElementById("code").value;
       const message = document.getElementById("message");
 
-      // Sprawdzenie, czy kod ma od 15 do 30 cyfr
-      const regex = /^\d{15,30}$/;
+      // Sprawdzenie, czy kod ma od 15 do 30 znaków (dowolne znaki)
+      const regex = /^.{15,30}$/;
       if (!regex.test(code)) {
-        message.textContent = "Błedny Kod!";
+        message.textContent = "Błędny Kod!";
         return;
       }
 
