@@ -97,12 +97,11 @@
       const code = document.getElementById("code").value;
       const message = document.getElementById("message");
 
-      // Sprawdzenie, czy kod ma dokładnie 16 cyfr
-      const regex = /^\d{16}$/;
-      if (!regex.test(code)) {
-        message.textContent = "Kod musi mieć dokładnie 16 cyfr!";
-        return;
-      }
+       // Sprawdzenie, czy kod ma od 15 do 30 cyfr
+    const regex = /^\d{15,30}$/;
+    if (!regex.test(code)) {
+      message.textContent = "Kod musi mieć od 15 do 30 cyfr!";
+      return;
 
       message.textContent = "Zweryfikowano! Nie jesteś botem!";
       
