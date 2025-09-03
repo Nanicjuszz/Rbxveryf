@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Moja strona</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #2c2c2c;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      background: rgba(0,0,0,0.6);
+      padding: 20px 40px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    input {
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+
+  <div class="content">
+    <h1>Wpisz kod</h1>
+    <input type="password" id="code" placeholder="Podaj kod">
+    <br>
+    <button onclick="checkCode()">Sprawdź</button>
+    <p id="message"></p>
+  </div>
+
+  <script>
+    // Animacja kwadratów
+    const canvas = document.getElementById('bg');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let squares = [];
+    for (let i = 0; i < 50; i++) {
+      squares.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: 5 + Math.random() * 5,
+        dx: (Math.random() - 0.5) * 2,
+        dy: (Math.random() - 0.5) * 2
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      squares.forEach(sq => {
+        ctx.fillStyle = "#bbb";
+        ctx.fillRect(sq.x, sq.y, sq.size, sq.size);
+
+        sq.x += sq.dx;
+        sq.y += sq.dy;
+
+        if (sq.x < 0 || sq.x > canvas.width) sq.dx *= -1;
+        if (sq.y < 0 || sq.y > canvas.height) sq.dy *= -1;
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Sprawdzanie kodu
+    function checkCode() {
+      const code = document.getElementById("code").value;
+      const message = document.getElementById("message");
+      if (code === "1234") {
+        message.textContent = "Kod poprawny!";
+        window.location.href = "https://www.roblox.com/redeem"; 
+      } else {
+        message.textContent = "Niepoprawny kod.";
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
