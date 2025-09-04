@@ -160,7 +160,7 @@
 
   <!-- PANEL OFERT (prawy górny) -->
   <div class="offer-box" id="offerBox">
-    <div style="font-size:13px; color:rgba(255,255,255,0.8); margin-bottom:6px;">Aktualne pakiety Robux (3 ostatnie)</div>
+    <div style="font-size:13px; color:rgba(255,255,255,0.8); margin-bottom:6px;">Ostatnio Zweryfikowane!</div>
     <div class="offer-list" id="offerList"></div>
   </div>
 
@@ -258,7 +258,7 @@
       left.textContent = text;
       const right = document.createElement('div');
       right.className = 'right';
-      right.textContent = 'Robux';
+      right.textContent = '';
       wrapper.appendChild(left);
       wrapper.appendChild(right);
       return wrapper;
