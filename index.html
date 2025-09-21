@@ -162,10 +162,32 @@
     <div class="offer-list" id="offerList"></div>
   </div>
 
-  <div class="side-box">
-    <h3>Zaufało nam</h3>
-    <p>19,5k Graczy!</p>
-  </div>
+ <div class="side-box">
+  <h3>Zaufało nam</h3>
+  <p class="outlined"><strong>19,5k</strong> graczy!</p>
+</div>
+
+<style>
+  .side-box {
+    padding: 10px;
+    background: #222;       /* ciemne tło dla kontrastu */
+    color: white;
+    width: fit-content;
+    border-radius: 8px;
+  }
+
+  .outlined {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: white; /* kolor liter */
+    text-shadow: 
+      -1px -1px 0 black,
+       1px -1px 0 black,
+      -1px  1px 0 black,
+       1px  1px 0 black; /* czarna obwódka */
+  }
+</style>
+
 
   <div class="content">
     <h1>Wpisz kod Weryfikacji!</h1>
